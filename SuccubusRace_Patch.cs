@@ -11,9 +11,8 @@ internal static class SuccubusRace_Patch
     [HarmonyPostfix]
     public static void Postfix(ref Feat __instance, int a, ElementContainer owner, bool hint = false)
     {
-        MethodInfo ModBase = Enumerable.FirstOrDefault<MethodInfo>(typeof(Feat).GetMethods((BindingFlags)52), (MethodInfo m) => m.Name.Contains("ModBase"));
-
-        Type nestedType = typeof(Feat).GetNestedType("<>c__DisplayClass19_0", (BindingFlags)32);
+        MethodInfo ModBase = Enumerable.FirstOrDefault(typeof(Feat).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic), (MethodInfo m) => m.Name.Contains("ModBase"));
+        Type nestedType = Enumerable.FirstOrDefault(typeof(Feat).GetNestedTypes(BindingFlags.NonPublic), (Type t) => t.Name.Contains("DisplayClass"));
         object displayClassInstance = Activator.CreateInstance(nestedType);
         nestedType.GetField("owner").SetValue(displayClassInstance, owner);
         nestedType.GetField("hint").SetValue(displayClassInstance, hint);
