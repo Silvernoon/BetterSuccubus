@@ -62,7 +62,7 @@ internal static class AI_Fuck_Patch
                     }
                     else if (chara != EClass.pc)
                     {
-                        int num = CalcMoney.Whore(chara2);
+                        int num = CalcMoney.Whore(chara2, chara);
                         if (__instance.bitch)
                             (chara2, chara) = (chara, chara2);
 
