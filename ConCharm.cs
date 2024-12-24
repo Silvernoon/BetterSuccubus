@@ -32,7 +32,7 @@ public class ConCharm : BadCondition
     public override void Tick()
     {
         //owner.ai = new NoGoal();
-        if (owner.ai == null || owner.ai is GoalCombat)
+        if (owner.ai == null || owner.ai is GoalCombat) // 接近
             owner.SetAI(new AI_Goto(pc.pos, 1));
         else owner.ai.DoGoto(pc.pos, 1, false, null);
 

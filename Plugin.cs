@@ -5,7 +5,8 @@ using BepInEx.Logging;
 using System.Net.NetworkInformation;
 using ReflexCLI;
 using System.Reflection;
-using EvilMask.Elin.ModOptions;
+using System.Linq;
+//using EvilMask.Elin.ModOptions;
 
 namespace BetterSuccubus;
 
@@ -17,6 +18,7 @@ public class BetterSuccubus : BaseUnityPlugin
     {
         Logger = base.Logger;
         var harmony = new Harmony("BetterSuccubus");
+
         LoadConfiguration();
         /*
         if (Settings.DreamBugTeleport)
@@ -25,7 +27,7 @@ public class BetterSuccubus : BaseUnityPlugin
             harmony.Unpatch(typeof(ConSleep).GetMethod(nameof(ConSleep.SuccubusSleep)), HarmonyPatchType.All, "BetterSuccubus");
         }*/
 
-        var controller = ModOptionController.Register(MyPluginInfo.PLUGIN_GUID, "sivn.bettersuccubus");
+        //var controller = ModOptionController.Register(MyPluginInfo.PLUGIN_GUID, "sivn.bettersuccubus");
 
         harmony.PatchAll();
         CommandRegistry.assemblies.Add(typeof(BetterSuccubus).Assembly);
@@ -100,18 +102,17 @@ public class BetterSuccubus : BaseUnityPlugin
         Settings.EnableNoHunger = configFile.Bind("Hunger", "EnableNoHunger", true, "Sex would reduct Hunger.\n超人会减少饥饿").Value;
         Settings.HungerValue = configFile.Bind("Hunger", "HungerValue", 20, "The Value reduct Hunger.\nEvery 50 of Hunger is a stage.\n减少饥饿的量，每50是一个阶段").Value;
         Settings.SexNoNeed = configFile.Bind("Ability", "SexNoNeed", false, "Able to sex even without precondition.\n超人无需前置条件").Value;
-        Settings.SexNoSleepy = configFile.Bind("Ability", "SexNoSleepy", true, "Sex no longer make you sleepy\n超人不再困倦").Value;
-        Settings.SexNoSleepyValue = configFile.Bind("Ability", "SexNoSleepyValue", 1, "The intensity of counteracting sleepiness after sex.\n超人抵抗困意的强度").Value;
+        //Settings.SexNoSleepy = configFile.Bind("Ability", "SexNoSleepy", true, "Sex no longer make you sleepy\n超人不再困倦").Value;
         Settings.SkillImprovement = configFile.Bind("Ability", "SkillImprovement", true, "Improve Skill (not Potential) after sex.\n超人提高技能（非潜力）").Value;
         Settings.SkillImprovementValue = configFile.Bind("Ability", "SkillImprovementValue", 250, "The value of Skill improvement (not Potential) after sex.\n超人提高技能（非潜力）的数值").Value;
         Settings.SkillImprovementPotential = configFile.Bind("Ability", "SkillImprovementPotential", true, "Improve Skill Potential after sex.\n超人提高技能潜力").Value;
-        Settings.GreaterReward = configFile.Bind("TailReward", "GreaterReward", true, "Make Tail Reward scaled by CHA\n启用爽一爽回报受魅力影响").Value;
-        Settings.GreaterRewardFactor = configFile.Bind("TailReward", "DreamBugCostFactor", 50, "The reward ends up adding CHA * Factor\n启用爽一爽受魅力影响的倍率 魅力*该值").Value;
+        //Settings.GreaterReward = configFile.Bind("TailReward", "GreaterReward", true, "Make Tail Reward scaled by CHA\n启用爽一爽回报受魅力影响").Value;
+        //Settings.GreaterRewardFactor = configFile.Bind("TailReward", "DreamBugCostFactor", 50, "The reward ends up adding CHA * Factor\n启用爽一爽受魅力影响的倍率 魅力*该值").Value;
         //DreamBug
         Settings.DreamBugTeleport = configFile.Bind("DreamBug", "DreamBugTeleport", true, "Enable DreamBug Teleport.\n启用梦虫传送").Value;
         Settings.DreamBugMakeSleep = configFile.Bind("DreamBug", "DreamBugMakeSleep", false, "DreamBug would put a target to sleep.\n启用梦虫催眠").Value;
         Settings.DreamBugStackable = configFile.Bind("DreamBug", "DreamBugStackable", true, "Make DreamBug Stackable\n梦虫可堆叠").Value;
-        Settings.DreamBugCanBeStolen = configFile.Bind("DreamBug", "DreamBugCanBeStolen", false, "Is DreamBug Can Be Stolen?\n梦虫能否被偷窃").Value;
+        //Settings.DreamBugCanBeStolen = configFile.Bind("DreamBug", "DreamBugCanBeStolen", false, "Is DreamBug Can Be Stolen?\n梦虫能否被偷窃").Value;
         Settings.DreamBugCostScale = configFile.Bind("DreamBug", "DreamBugCostScale", 0.5f, "DreamBug Cost Scale.\nSet to 0.5 means half the cost of origin\n梦虫耐力消耗倍率").Value;
         //ActCharm
         Settings.FailedCharmMakeHostile = configFile.Bind("ActCharm", "FailedCharmMakeHostile", true, "Failed Charm would make target hostile.\n魅惑失败使对方敌对").Value;

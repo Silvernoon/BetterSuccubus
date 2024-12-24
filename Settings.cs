@@ -11,19 +11,18 @@ public static class Settings
     public static bool EnableNoHunger { get; set; }
     public static int HungerValue { get; set; }
     public static bool SexNoNeed { get; set; }
-    public static bool SexNoSleepy { get; set; }
-    public static int SexNoSleepyValue { get; set; }
+    //public static bool SexNoSleepy { get; set; }
     public static bool SkillImprovement { get; set; }
     public static bool SkillImprovementPotential { get; set; }
     public static int SkillImprovementValue { get; set; }
-    public static bool GreaterReward { get; set; }
-    public static int GreaterRewardFactor { get; set; }
+    //public static bool GreaterReward { get; set; }
+    //public static int GreaterRewardFactor { get; set; }
     // DreamBug
     public static bool DreamBugTeleport { get; set; }
     public static bool DreamBugMakeSleep { get; set; }
     public static float DreamBugCostScale { get; set; }
     public static bool DreamBugStackable { get; set; }
-    public static bool DreamBugCanBeStolen { get; set; }
+    //public static bool DreamBugCanBeStolen { get; set; }
     // ActCharm
     public static bool FailedCharmMakeHostile { get; set; }
     // Debug
