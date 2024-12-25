@@ -5,6 +5,7 @@ using System.Reflection.Emit;
 using System.Linq;
 using System.Reflection;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace BetterSuccubus;
 
@@ -17,7 +18,14 @@ static class AI_Fuck_Patch
         //Affinity
         //chara2.ModAffinity(chara, flag ? 10 : (-5));
         //flag = chara.IsSuccubus() || chara2.IsSuccubus() || EClass.rnd(2) == 0;
-
+        codeMatcher.MatchEndForward(new(OpCodes.Ldc_I4_2), new(OpCodes.Call, AccessTools.Method(typeof(EClass), nameof(EClass.rnd))), new(OpCodes.Ldc_I4_0), new(OpCodes.Ceq), new(OpCodes.Stloc_2))
+            .Advance(1)
+            .InsertAndAdvance(
+                new(OpCodes.Ldloc_0),
+                new(OpCodes.Ldloc_1),
+                Transpilers.EmitDelegate((Chara chara, Chara chara2) => { return chara.IsSuccubus() || chara2.IsSuccubus() || EClass.rnd(2) == 0; }),
+                new(OpCodes.Stloc_2)
+                );
         codeMatcher.MatchStartForward(new CodeMatch(o => o.opcode == OpCodes.Call && o.operand.ToString().Contains("<Finish>g__SuccubusExp")))
             .Advance(1)
             .InsertAndAdvance(new(OpCodes.Ldloc_0), new(OpCodes.Ldloc_1), Transpilers.EmitDelegate(Damage))
