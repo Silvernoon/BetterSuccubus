@@ -85,7 +85,7 @@ static class OnDie
     }
 }
 
-[HarmonyPatch("AI_Fuck+<Run>d__25", "MoveNext")]
+[HarmonyPatch(typeof(AI_Fuck), nameof(AI_Fuck.Run), MethodType.Enumerator)]
 static class AI_Fuck_Run_Patch
 {
     static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
