@@ -106,6 +106,7 @@ public class BetterSuccubus : BaseUnityPlugin
         Settings.SkillImprovement = configFile.Bind("Ability", "SkillImprovement", true, "Improve Skill (not Potential) after sex.\n超人提高技能（非潜力）").Value;
         Settings.SkillImprovementValue = configFile.Bind("Ability", "SkillImprovementValue", 250, "The value of Skill improvement (not Potential) after sex.\n超人提高技能（非潜力）的数值").Value;
         Settings.SkillImprovementPotential = configFile.Bind("Ability", "SkillImprovementPotential", true, "Improve Skill Potential after sex.\n超人提高技能潜力").Value;
+        Settings.AffinityIncrease = configFile.Bind("Ability", "AffinityIncrease", true, "Affinity is bound to Increase after sex.\n超人必定增加好感").Value;
         //Settings.GreaterReward = configFile.Bind("TailReward", "GreaterReward", true, "Make Tail Reward scaled by CHA\n启用爽一爽回报受魅力影响").Value;
         //Settings.GreaterRewardFactor = configFile.Bind("TailReward", "DreamBugCostFactor", 50, "The reward ends up adding CHA * Factor\n启用爽一爽受魅力影响的倍率 魅力*该值").Value;
         //DreamBug

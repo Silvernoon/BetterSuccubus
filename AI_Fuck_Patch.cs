@@ -14,25 +14,23 @@ static class AI_Fuck_Patch
 {
     static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
     {
-        CodeMatcher codeMatcher = new(instructions);
         //Affinity
         //chara2.ModAffinity(chara, flag ? 10 : (-5));
         //flag = chara.IsSuccubus() || chara2.IsSuccubus() || EClass.rnd(2) == 0;
-        codeMatcher.MatchEndForward(new(OpCodes.Ldc_I4_2), new(OpCodes.Call, AccessTools.Method(typeof(EClass), nameof(EClass.rnd))), new(OpCodes.Ldc_I4_0), new(OpCodes.Ceq), new(OpCodes.Stloc_2))
+        return new CodeMatcher(instructions).MatchEndForward(new(OpCodes.Ldc_I4_2), new(OpCodes.Call, AccessTools.Method(typeof(EClass), nameof(EClass.rnd))), new(OpCodes.Ldc_I4_0), new(OpCodes.Ceq), new(OpCodes.Stloc_2))
             .Advance(1)
             .InsertAndAdvance(
                 new(OpCodes.Ldloc_0),
                 new(OpCodes.Ldloc_1),
-                Transpilers.EmitDelegate((Chara chara, Chara chara2) => { return chara.IsSuccubus() || chara2.IsSuccubus() || EClass.rnd(2) == 0; }),
+                Transpilers.EmitDelegate((Chara chara, Chara chara2) => { return (Settings.AffinityIncrease && (chara.IsSuccubus() || chara2.IsSuccubus())) || EClass.rnd(2) == 0; }),
                 new(OpCodes.Stloc_2)
-                );
-        codeMatcher.MatchStartForward(new CodeMatch(o => o.opcode == OpCodes.Call && o.operand.ToString().Contains("<Finish>g__SuccubusExp")))
+                )
+        .MatchStartForward(new CodeMatch(o => o.opcode == OpCodes.Call && o.operand.ToString().Contains("<Finish>g__SuccubusExp")))
             .Advance(1)
             .InsertAndAdvance(new(OpCodes.Ldloc_0), new(OpCodes.Ldloc_1), Transpilers.EmitDelegate(Damage))
             .InsertAndAdvance(new(OpCodes.Ldloc_0), new(OpCodes.Ldloc_1), Transpilers.EmitDelegate(SuccubusSkillExp))
-            .InsertAndAdvance(new(OpCodes.Ldloc_1), new(OpCodes.Ldloc_0), Transpilers.EmitDelegate(SuccubusSkillExp));
-
-        return codeMatcher.InstructionEnumeration();
+            .InsertAndAdvance(new(OpCodes.Ldloc_1), new(OpCodes.Ldloc_0), Transpilers.EmitDelegate(SuccubusSkillExp))
+        .InstructionEnumeration();
     }
     static void Damage(Chara chara, Chara chara2)
     {
@@ -63,7 +61,7 @@ static class AI_Fuck_Patch
 }
 
 [HarmonyPatch(typeof(Chara), nameof(Chara.Die))]
-internal static class OnDie
+static class OnDie
 {
     static bool Prefix(Chara __instance, Card origin, AttackSource attackSource)
     {
@@ -133,7 +131,7 @@ static class AI_Fuck_Run_Patch
 }
 
 [HarmonyPatch(typeof(ActPlan), nameof(ActPlan._Update))]
-internal static class ActPlan_Patch
+static class ActPlan_Patch
 {
     static void Postfix(ActPlan __instance)
     {

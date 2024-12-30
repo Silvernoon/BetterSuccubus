@@ -4,6 +4,7 @@ namespace BetterSuccubus;
 
 public static class Settings
 {
+    // Fuck
     public static bool EnableHPDrain { get; set; }
     public static bool EnableMPDrain { get; set; }
     public static bool EnableSTRecovery { get; set; }
@@ -15,6 +16,7 @@ public static class Settings
     public static bool SkillImprovement { get; set; }
     public static bool SkillImprovementPotential { get; set; }
     public static int SkillImprovementValue { get; set; }
+    public static bool AffinityIncrease { get; set; }
     //public static bool GreaterReward { get; set; }
     //public static int GreaterRewardFactor { get; set; }
     // DreamBug
