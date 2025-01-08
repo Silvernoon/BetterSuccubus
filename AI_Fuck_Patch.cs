@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
+
 namespace BetterSuccubus;
 
 [HarmonyPatch(typeof(AI_Fuck), nameof(AI_Fuck.Finish))]
@@ -14,23 +15,38 @@ static class AI_Fuck_Patch
 {
     static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
     {
+        CodeMatcher codeMatcher = new(instructions);
         //Affinity
         //chara2.ModAffinity(chara, flag ? 10 : (-5));
         //flag = chara.IsSuccubus() || chara2.IsSuccubus() || EClass.rnd(2) == 0;
-        return new CodeMatcher(instructions).MatchEndForward(new(OpCodes.Ldc_I4_2), new(OpCodes.Call, AccessTools.Method(typeof(EClass), nameof(EClass.rnd))), new(OpCodes.Ldc_I4_0), new(OpCodes.Ceq), new(OpCodes.Stloc_2))
+        codeMatcher.MatchEndForward(new(OpCodes.Ldc_I4_2), new(OpCodes.Call, AccessTools.Method(typeof(EClass), nameof(EClass.rnd))), new(OpCodes.Ldc_I4_0), new(OpCodes.Ceq), new(OpCodes.Stloc_2))
             .Advance(1)
             .InsertAndAdvance(
                 new(OpCodes.Ldloc_0),
                 new(OpCodes.Ldloc_1),
                 Transpilers.EmitDelegate((Chara chara, Chara chara2) => { return (Settings.AffinityIncrease && (chara.IsSuccubus() || chara2.IsSuccubus())) || EClass.rnd(2) == 0; }),
                 new(OpCodes.Stloc_2)
-                )
-        .MatchStartForward(new CodeMatch(o => o.opcode == OpCodes.Call && o.operand.ToString().Contains("<Finish>g__SuccubusExp")))
+                );
+        /*
+                codeMatcher.MatchStartForward(new(OpCodes.Ldloc_0), new(OpCodes.Callvirt, AccessTools.Method(typeof(Card), "get_IsPCParty")),new(OpCodes.Brtrue_S),new(OpCodes.Ldloc_0), new(OpCodes.Callvirt, AccessTools.Method(typeof(Card), "get_IsPCParty")),new(OpCodes.Brfalse_S));
+                Label a = (Label)codeMatcher.InstructionAt(3).operand;
+                Label b = (Label)codeMatcher.InstructionAt(6).operand;
+                codeMatcher.MatchStartForward(new CodeMatch(OpCodes.Callvirt, typeof(Stats).GetMethod("Mod"))).MatchStartForward(new CodeMatch(OpCodes.Callvirt, typeof(Stats).GetMethod("Mod")));
+        */
+        if (Settings.EnableSTRecovery)
+        {
+            codeMatcher.MatchStartForward(new CodeMatch(OpCodes.Sub)).Set(OpCodes.Add, null);
+            codeMatcher.MatchStartForward(new CodeMatch(OpCodes.Sub)).Set(OpCodes.Add, null);
+        }
+
+        codeMatcher.MatchStartForward(new CodeMatch(o => o.opcode == OpCodes.Call && o.operand.ToString().Contains("<Finish>g__SuccubusExp")))
             .Advance(1)
             .InsertAndAdvance(new(OpCodes.Ldloc_0), new(OpCodes.Ldloc_1), Transpilers.EmitDelegate(Damage))
             .InsertAndAdvance(new(OpCodes.Ldloc_0), new(OpCodes.Ldloc_1), Transpilers.EmitDelegate(SuccubusSkillExp))
             .InsertAndAdvance(new(OpCodes.Ldloc_1), new(OpCodes.Ldloc_0), Transpilers.EmitDelegate(SuccubusSkillExp))
         .InstructionEnumeration();
+
+        return codeMatcher.InstructionEnumeration();
     }
     static void Damage(Chara chara, Chara chara2)
     {
@@ -107,13 +123,11 @@ static class AI_Fuck_Run_Patch
     {
         if (chara.IsPCParty || chara2.IsPCParty)
         {
-            int num = -1 - EClass.rnd(chara.stamina.max / 10 / 25);
-            if (!chara.IsSuccubus())
-                chara.stamina.Mod(num);
-            else
+            //int num = -1 - EClass.rnd(chara.stamina.max / 10 / 25);
+            if (chara.IsSuccubus())
             {
                 int i = 1 + EClass.rnd((int)(chara.stamina.max * Settings.DrainScale) / 10);
-                chara.stamina.Mod(Settings.EnableSTRecovery ? (i + chara2.LV / 10) : num);
+                //chara.stamina.Mod(Settings.EnableSTRecovery ? (i + chara2.LV / 10) : num);
                 if (Settings.EnableNoHunger) chara.hunger.Mod(-Settings.HungerValue);
                 if (Settings.EnableHPDrain)
                 {
