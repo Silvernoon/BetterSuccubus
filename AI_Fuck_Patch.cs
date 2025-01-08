@@ -41,12 +41,17 @@ static class AI_Fuck_Patch
 
         codeMatcher.MatchStartForward(new CodeMatch(o => o.opcode == OpCodes.Call && o.operand.ToString().Contains("<Finish>g__SuccubusExp")))
             .Advance(1)
-            .InsertAndAdvance(new(OpCodes.Ldloc_0), new(OpCodes.Ldloc_1), Transpilers.EmitDelegate(Damage))
-            .InsertAndAdvance(new(OpCodes.Ldloc_0), new(OpCodes.Ldloc_1), Transpilers.EmitDelegate(SuccubusSkillExp))
-            .InsertAndAdvance(new(OpCodes.Ldloc_1), new(OpCodes.Ldloc_0), Transpilers.EmitDelegate(SuccubusSkillExp))
-        .InstructionEnumeration();
+            .InsertAndAdvance(new(OpCodes.Ldloc_0), new(OpCodes.Ldloc_1), Transpilers.EmitDelegate(Trigger))
+            ;
 
         return codeMatcher.InstructionEnumeration();
+    }
+    static void Trigger(Chara chara,Chara chara2)
+    {
+        Damage(chara, chara2);
+        SuccubusSkillExp(chara, chara2);
+        SuccubusSkillExp(chara2, chara);
+        if (Settings.EnableNoHunger) chara.hunger.Mod(-Settings.HungerValue);
     }
     static void Damage(Chara chara, Chara chara2)
     {
@@ -128,7 +133,6 @@ static class AI_Fuck_Run_Patch
             {
                 int i = 1 + EClass.rnd((int)(chara.stamina.max * Settings.DrainScale) / 10);
                 //chara.stamina.Mod(Settings.EnableSTRecovery ? (i + chara2.LV / 10) : num);
-                if (Settings.EnableNoHunger) chara.hunger.Mod(-Settings.HungerValue);
                 if (Settings.EnableHPDrain)
                 {
                     chara.HealHP(i);
