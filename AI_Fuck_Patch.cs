@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-
 namespace BetterSuccubus;
 
 [HarmonyPatch(typeof(AI_Fuck), nameof(AI_Fuck.Finish))]
@@ -16,7 +15,7 @@ static class AI_Fuck_Patch
     static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
     {
         CodeMatcher codeMatcher = new(instructions);
-        //Affinity
+        #region Affinity
         //chara2.ModAffinity(chara, flag ? 10 : (-5));
         //flag = chara.IsSuccubus() || chara2.IsSuccubus() || EClass.rnd(2) == 0;
         codeMatcher.MatchEndForward(new(OpCodes.Ldc_I4_2), new(OpCodes.Call, AccessTools.Method(typeof(EClass), nameof(EClass.rnd))), new(OpCodes.Ldc_I4_0), new(OpCodes.Ceq), new(OpCodes.Stloc_2))
@@ -27,31 +26,37 @@ static class AI_Fuck_Patch
                 Transpilers.EmitDelegate((Chara chara, Chara chara2) => { return (Settings.AffinityIncrease && (chara.IsSuccubus() || chara2.IsSuccubus())) || EClass.rnd(2) == 0; }),
                 new(OpCodes.Stloc_2)
                 );
-        /*
-                codeMatcher.MatchStartForward(new(OpCodes.Ldloc_0), new(OpCodes.Callvirt, AccessTools.Method(typeof(Card), "get_IsPCParty")),new(OpCodes.Brtrue_S),new(OpCodes.Ldloc_0), new(OpCodes.Callvirt, AccessTools.Method(typeof(Card), "get_IsPCParty")),new(OpCodes.Brfalse_S));
-                Label a = (Label)codeMatcher.InstructionAt(3).operand;
-                Label b = (Label)codeMatcher.InstructionAt(6).operand;
-                codeMatcher.MatchStartForward(new CodeMatch(OpCodes.Callvirt, typeof(Stats).GetMethod("Mod"))).MatchStartForward(new CodeMatch(OpCodes.Callvirt, typeof(Stats).GetMethod("Mod")));
-        */
-        if (Settings.EnableSTRecovery)
+        #endregion
+        #region Stamina Recover
+        if (Settings.EnableSTRecover)
         {
-            codeMatcher.MatchStartForward(new CodeMatch(OpCodes.Sub)).Set(OpCodes.Add, null);
-            codeMatcher.MatchStartForward(new CodeMatch(OpCodes.Sub)).Set(OpCodes.Add, null);
+            codeMatcher.MatchStartForward(new(OpCodes.Ldloc_0), new(OpCodes.Callvirt, AccessTools.DeclaredPropertyGetter(typeof(Card), nameof(Card.IsPCParty))))
+                       .Advance(5);
+            for (int i = 0; i < 2; i++)
+            {
+                var target = codeMatcher.Advance(1).Instruction;
+                int b = codeMatcher.Advance(2).Pos;
+                int a = codeMatcher.MatchStartForward(new CodeMatch(OpCodes.Callvirt, AccessTools.DeclaredMethod(typeof(Stats), nameof(Stats.Mod)))).Pos;
+                codeMatcher.RemoveInstructionsInRange(b, a - 1)
+                           .Advance(-(a - 1 - b + 1))
+                           .InsertAndAdvance(target, Transpilers.EmitDelegate((Chara chara) => 1 + EClass.rnd(chara.stamina.max / 10 + 1)));
+            }
         }
-
+        #endregion
+        #region After SuccubusExp (End of Fuck.Finish)
         codeMatcher.MatchStartForward(new CodeMatch(o => o.opcode == OpCodes.Call && o.operand.ToString().Contains("<Finish>g__SuccubusExp")))
             .Advance(1)
-            .InsertAndAdvance(new(OpCodes.Ldloc_0), new(OpCodes.Ldloc_1), Transpilers.EmitDelegate(Trigger))
+            .InsertAndAdvance(new(OpCodes.Ldloc_0), new(OpCodes.Ldloc_1), Transpilers.EmitDelegate(
+                (Chara chara, Chara chara2) =>
+                {
+                    Damage(chara, chara2);
+                    SuccubusSkillExp(chara, chara2);
+                    SuccubusSkillExp(chara2, chara);
+                    if (Settings.EnableNoHunger) chara.hunger.Mod(-Settings.HungerValue);
+                }))
             ;
-
+        #endregion
         return codeMatcher.InstructionEnumeration();
-    }
-    static void Trigger(Chara chara,Chara chara2)
-    {
-        Damage(chara, chara2);
-        SuccubusSkillExp(chara, chara2);
-        SuccubusSkillExp(chara2, chara);
-        if (Settings.EnableNoHunger) chara.hunger.Mod(-Settings.HungerValue);
     }
     static void Damage(Chara chara, Chara chara2)
     {

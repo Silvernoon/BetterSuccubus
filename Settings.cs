@@ -7,7 +7,7 @@ public static class Settings
     // Fuck
     public static bool EnableHPDrain { get; set; }
     public static bool EnableMPDrain { get; set; }
-    public static bool EnableSTRecovery { get; set; }
+    public static bool EnableSTRecover { get; set; }
     public static float DrainScale { get; set; }
     public static bool EnableNoHunger { get; set; }
     public static int HungerValue { get; set; }
