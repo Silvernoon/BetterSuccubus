@@ -6,15 +6,16 @@ using System.Linq;
 using System.Reflection;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System;
 
 namespace BetterSuccubus;
 
 [HarmonyPatch(typeof(AI_Fuck), nameof(AI_Fuck.Finish))]
 static class AI_Fuck_Patch
 {
-    static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+    static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
     {
-        CodeMatcher codeMatcher = new(instructions);
+        CodeMatcher codeMatcher = new(instructions, generator);
         #region Affinity
         //chara2.ModAffinity(chara, flag ? 10 : (-5));
         //flag = chara.IsSuccubus() || chara2.IsSuccubus() || EClass.rnd(2) == 0;
@@ -30,33 +31,41 @@ static class AI_Fuck_Patch
         #region Stamina Recover
         if (Settings.EnableSTRecover)
         {
-            codeMatcher.MatchStartForward(new(OpCodes.Ldloc_0), new(OpCodes.Callvirt, AccessTools.DeclaredPropertyGetter(typeof(Card), nameof(Card.IsPCParty))))
-                       .Advance(5);
-            for (int i = 0; i < 2; i++)
-            {
-                var target = codeMatcher.Advance(1).Instruction;
-                int b = codeMatcher.Advance(2).Pos;
-                int a = codeMatcher.MatchStartForward(new CodeMatch(OpCodes.Callvirt, AccessTools.DeclaredMethod(typeof(Stats), nameof(Stats.Mod)))).Pos;
-                codeMatcher.RemoveInstructionsInRange(b, a - 1)
-                           .Advance(-(a - 1 - b + 1))
-                           .InsertAndAdvance(target, Transpilers.EmitDelegate((Chara chara) => 1 + EClass.rnd(chara.stamina.max / 10 + 1)));
-            }
+            codeMatcher.MatchStartForward(new(OpCodes.Ldloc_0), new(OpCodes.Callvirt, AccessTools.DeclaredPropertyGetter(typeof(Card), nameof(Card.IsPCParty))));
+            int pos1 = codeMatcher.Pos;
+            int pos2 = codeMatcher.MatchStartForward(new CodeMatch(OpCodes.Callvirt, AccessTools.DeclaredMethod(typeof(Stats), nameof(Stats.Mod))))
+                                  .MatchStartForward(new CodeMatch(OpCodes.Callvirt, AccessTools.DeclaredMethod(typeof(Stats), nameof(Stats.Mod))))
+                                  .Pos;
+            codeMatcher.RemoveInstructionsInRange(pos1+1, pos2);
+            codeMatcher.InsertAndAdvance(//Avoid to Remove Label
+                                         new(OpCodes.Ldloc_1),
+                                         Transpilers.EmitDelegate(
+                                            (Chara chara, Chara chara2) =>
+                                            {
+                                                chara.stamina.Mod(chara.IsSuccubus() ? (1 + EClass.rnd(chara.stamina.max / 10 + 1)) : (-5 - EClass.rnd(chara.stamina.max / 10 + 1)));
+                                                chara2.stamina.Mod(chara.IsSuccubus() ? (1 + EClass.rnd(chara.stamina.max / 20 + 1)) :(-5 - EClass.rnd(chara2.stamina.max / 20 + 1)));
+                                            }));
         }
         #endregion
         #region After SuccubusExp (End of Fuck.Finish)
         codeMatcher.MatchStartForward(new CodeMatch(o => o.opcode == OpCodes.Call && o.operand.ToString().Contains("<Finish>g__SuccubusExp")))
-            .Advance(1)
-            .InsertAndAdvance(new(OpCodes.Ldloc_0), new(OpCodes.Ldloc_1), Transpilers.EmitDelegate(
-                (Chara chara, Chara chara2) =>
-                {
-                    Damage(chara, chara2);
-                    SuccubusSkillExp(chara, chara2);
-                    SuccubusSkillExp(chara2, chara);
-                    if (Settings.EnableNoHunger) chara.hunger.Mod(-Settings.HungerValue);
-                }))
-            ;
+                .Advance(1)
+                .InsertAndAdvance(new(OpCodes.Ldloc_0), new(OpCodes.Ldloc_1), Transpilers.EmitDelegate(
+                    (Chara chara, Chara chara2) =>
+                    {
+                        Damage(chara, chara2);
+                        SuccubusSkillExp(chara, chara2);
+                        SuccubusSkillExp(chara2, chara);
+                        if (Settings.EnableNoHunger) chara.hunger.Mod(-Settings.HungerValue);
+                    }))
+                ;
         #endregion
+
         return codeMatcher.InstructionEnumeration();
+    }
+    static void StaminaMod(Chara chara, Chara chara2)
+    {
+
     }
     static void Damage(Chara chara, Chara chara2)
     {
@@ -221,5 +230,13 @@ public static class CharaExtension
     public static bool IsSuccubus(this Chara chara)
     {
         return chara.HasElement(1216);
+    }
+}
+
+public static class TranspilersExtension
+{
+    public static CodeInstruction Callvirt<T>(T action) where T : Delegate
+    {
+        return new CodeInstruction(OpCodes.Callvirt, action.Method);
     }
 }
