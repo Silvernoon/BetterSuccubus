@@ -37,14 +37,44 @@ public class BetterSuccubus : BaseUnityPlugin
         Path = System.IO.Path.GetDirectoryName(Info.Location);
         SourceManager sources = Core.Instance.sources;
         //sources.elements.rows.Add(AddSource.ActCharm);
-        ModUtil.ImportExcel(Path + "/Element.xlsx", "Element", sources.elements);
+        BetterSuccubus.Logger.LogError("NM");
+        //ModUtil.ImportExcel(Path + "/Element.xlsx", "Element", sources.elements);
         //ModUtil.ImportExcel(Path + "/stats.xlsx", "stats", sources.stats);
 
-        sources.elements.GetRow("6030").name_L = "魅惑";
-        sources.elements.GetRow("6030").detail_JP = "対象を誘惑して虜にする。また失敗すれば敵対する。";
-        sources.elements.GetRow("6030").detail_L = "释放魅力让目标成为你的俘虏任你摆布，但是失败的话则会成为敌人。";
-        sources.elements.GetRow("6030").detail = "Unleash your charm to make target fall under your spell, but failure could make it an enemy.";
-        sources.elements.GetRow("6030").textExtra_L = "赋予魅惑效果50回合,目标的意志使效果降低了,目标会靠近你,允许捕食";
+        sources.elements.rows.Add(new SourceElement.Row()
+        {
+            id = 6030,
+            alias = "ActCharm",
+            name_JP = "チャーム",
+            name = "Charm",
+            name_L = "魅惑",
+            aliasParent = "CHA",
+            parentFactor = 20f,
+            lvFactor = 100,
+            encFactor = 100,
+            mtp = 1,
+            LV = 1,
+            chance = 1000,
+            cost = [10],
+            target = "Chara",
+            proc = ["Debuff","ConCharm"],
+            type = "ActCharm",
+            group = "ABILITY",
+            category = "ability",
+            categorySub = "ability",
+            eleP = 50,
+            cooldown = 100,
+            charge = 10,
+            radius = 5,
+            max = 2,
+            textExtra_JP = "対象が接近する,エナジードレインが使える",
+            textExtra = "The target will approach you,Allow predation",
+            textExtra_L = "赋予魅惑效果50回合,目标的意志使效果降低了,目标会靠近你,允许捕食",
+            detail = "Unleash your charm to make target fall under your spell, but failure could make it an enemy.",
+            detail_JP = "対象を誘惑して虜にする。また失敗すれば敵対する。",
+            detail_L = "释放魅力让目标成为你的俘虏任你摆布，但是失败的话则会成为敌人。",
+            langAct = []
+        });
 
         sources.stats.rows.Add(new SourceStat.Row()
         {
