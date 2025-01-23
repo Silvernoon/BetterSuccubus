@@ -74,7 +74,8 @@ public class BetterSuccubus : BaseUnityPlugin
             detail_JP = "対象を誘惑して虜にする。また失敗すれば敵対する。",
             detail_L = "释放魅力让目标成为你的俘虏任你摆布，但是失败的话则会成为敌人。",
             langAct = [],
-            abilityType = []
+            abilityType = [],
+            thing = ""
         });
 
         sources.stats.rows.Add(new SourceStat.Row()
