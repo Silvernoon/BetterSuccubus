@@ -6,6 +6,8 @@ using System.Net.NetworkInformation;
 using ReflexCLI;
 using System.Reflection;
 using System.Linq;
+using Newtonsoft.Json.Serialization;
+using System;
 //using EvilMask.Elin.ModOptions;
 
 namespace BetterSuccubus;
@@ -37,10 +39,8 @@ public class BetterSuccubus : BaseUnityPlugin
         Path = System.IO.Path.GetDirectoryName(Info.Location);
         SourceManager sources = Core.Instance.sources;
         //sources.elements.rows.Add(AddSource.ActCharm);
-        BetterSuccubus.Logger.LogError("NM");
         //ModUtil.ImportExcel(Path + "/Element.xlsx", "Element", sources.elements);
         //ModUtil.ImportExcel(Path + "/stats.xlsx", "stats", sources.stats);
-
         sources.elements.rows.Add(new SourceElement.Row()
         {
             id = 6030,
@@ -57,7 +57,7 @@ public class BetterSuccubus : BaseUnityPlugin
             chance = 1000,
             cost = [10],
             target = "Chara",
-            proc = ["Debuff","ConCharm"],
+            proc = ["Debuff", "ConCharm"],
             type = "ActCharm",
             group = "ABILITY",
             category = "ability",
@@ -75,7 +75,8 @@ public class BetterSuccubus : BaseUnityPlugin
             detail_L = "释放魅力让目标成为你的俘虏任你摆布，但是失败的话则会成为敌人。",
             langAct = [],
             abilityType = [],
-            thing = ""
+            thing = "",
+            foodEffect = []
         });
 
         sources.stats.rows.Add(new SourceStat.Row()
@@ -160,4 +161,21 @@ public class BetterSuccubus : BaseUnityPlugin
         Settings.KillBoostAttributes = configFile.Bind("Kill", "KillBoostAttributes", 500, "Kill target being charmed would improve attributes.\n超死被魅惑的敌人提升属性的倍率").Value;
     }
     public static string Path { get; private set; }
+
+    public T Initer<T>(T target, T source)
+    {
+        Type t = typeof(T);
+
+        var properties = t.GetProperties().Where(prop => prop.CanRead && prop.CanWrite);
+
+        foreach (var prop in properties)
+        {
+            var value = prop.GetValue(source, null);
+            if (prop.GetValue(target, null) == null)
+                {
+                    BetterSuccubus.Logger.LogError("F");
+                    prop.SetValue(target, value, null);}
+        }
+        return target;
+    }
 }
