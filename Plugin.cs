@@ -41,7 +41,7 @@ public class BetterSuccubus : BaseUnityPlugin
         //sources.elements.rows.Add(AddSource.ActCharm);
         //ModUtil.ImportExcel(Path + "/Element.xlsx", "Element", sources.elements);
         //ModUtil.ImportExcel(Path + "/stats.xlsx", "stats", sources.stats);
-        sources.elements.rows.Add(new SourceElement.Row()
+        sources.elements.rows.Add(Initer(new SourceElement.Row()
         {
             id = 6030,
             alias = "ActCharm",
@@ -72,12 +72,8 @@ public class BetterSuccubus : BaseUnityPlugin
             textExtra_L = "赋予魅惑效果50回合,目标的意志使效果降低了,目标会靠近你,允许捕食",
             detail = "Unleash your charm to make target fall under your spell, but failure could make it an enemy.",
             detail_JP = "対象を誘惑して虜にする。また失敗すれば敵対する。",
-            detail_L = "释放魅力让目标成为你的俘虏任你摆布，但是失败的话则会成为敌人。",
-            langAct = [],
-            abilityType = [],
-            thing = "",
-            foodEffect = []
-        });
+            detail_L = "释放魅力让目标成为你的俘虏任你摆布，但是失败的话则会成为敌人。"
+        }, sources.elements.rows[0]));
 
         sources.stats.rows.Add(new SourceStat.Row()
         {
@@ -162,19 +158,17 @@ public class BetterSuccubus : BaseUnityPlugin
     }
     public static string Path { get; private set; }
 
-    public T Initer<T>(T target, T source)
+    public T Initer<T>(T target, T tempalte)
     {
         Type t = typeof(T);
 
-        var properties = t.GetProperties().Where(prop => prop.CanRead && prop.CanWrite);
-
+        var properties = t.GetFields();
+        //.Where(prop => prop.CanRead && prop.CanWrite);
         foreach (var prop in properties)
         {
-            var value = prop.GetValue(source, null);
-            if (prop.GetValue(target, null) == null)
-                {
-                    BetterSuccubus.Logger.LogError("F");
-                    prop.SetValue(target, value, null);}
+            var value = prop.GetValue(tempalte);
+            if (prop.GetValue(target) == null)
+                prop.SetValue(target, value);
         }
         return target;
     }
