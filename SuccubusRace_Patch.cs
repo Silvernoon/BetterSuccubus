@@ -6,28 +6,31 @@ using HarmonyLib;
 namespace BetterSuccubus;
 
 [HarmonyPatch(typeof(Feat), nameof(Feat.Apply))]
-internal static class SuccubusRace_Patch
+static class SuccubusRace_Patch
 {
-    [HarmonyPostfix]
-    public static void Postfix(ref Feat __instance, int a, ElementContainer owner, bool hint = false)
+    private static void Postfix(ref Feat __instance, int a, ElementContainer owner, bool hint = false)
     {
-        MethodInfo ModBase = Enumerable.FirstOrDefault(typeof(Feat).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic), (MethodInfo m) => m.Name.Contains("ModBase"));
-        Type nestedType = Enumerable.FirstOrDefault(typeof(Feat).GetNestedTypes(BindingFlags.NonPublic), (Type t) => t.Name.Contains("DisplayClass"));
-        object displayClassInstance = Activator.CreateInstance(nestedType);
-        nestedType.GetField("owner").SetValue(displayClassInstance, owner);
-        nestedType.GetField("hint").SetValue(displayClassInstance, hint);
-        int id = __instance.id;
-        if (id == 1216)
+        MethodInfo methodInfo = typeof(Feat).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).FirstOrDefault((MethodInfo m) => m.Name.Contains("ModBase"));
+        Type type = typeof(Feat).GetNestedTypes(BindingFlags.NonPublic).FirstOrDefault(t => t.Name.Contains("DisplayClass"));
+        object obj = Activator.CreateInstance(type);
+        type.GetField("owner").SetValue(obj, owner);
+        type.GetField("hint").SetValue(obj, hint);
+        if (__instance.id == 1216 && __instance.owner == EClass.pc.elements)
         {
-            //ModBase.Invoke(__instance, [6020, a, false, displayClassInstance]);
-            ModBase.Invoke(__instance, [6030, a, false, displayClassInstance]);
+            methodInfo.Invoke(__instance,
+            [
+                    60030,
+                    a,
+                    false,
+                    obj
+            ]);
         }
     }
-    public const int ActCharm = 6030;
+    public const int ActCharm = 60030;
 }
 
 [HarmonyPatch(typeof(Player), nameof(Player.OnLoad))]
-internal static class AddAbility
+static class AddAbility
 {
     [HarmonyPostfix]
     public static void Postfix()

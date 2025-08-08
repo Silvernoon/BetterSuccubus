@@ -120,6 +120,9 @@ public class BetterSuccubus : BaseUnityPlugin
             strPhase = [],
             invert = false
         });
+        sources.elements.initialized = false;
+        sources.stats.initialized = false;
+        TexManager.Load();
     }
     private void LoadConfiguration()
     {

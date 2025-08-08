@@ -177,16 +177,14 @@ static class ActPlan_Patch
             {
                 Chara chara = _c.Chara;
                 if (chara == null || !EClass.pc.CanSee(chara))
-                {
                     return;
-                }
-                int num = chara.Dist(EClass.pc);
-                if (num > 1 && EClass.pc.isBlind)
-                {
+
+                int distance = chara.Dist(EClass.pc);
+                if (distance > 1 && EClass.pc.isBlind)
                     return;
-                }
+
                 bool isKey = __instance.input == ActInput.Key;
-                if (!EClass.pc.isBlind && __instance.input == ActInput.AllAction && (__instance.input == ActInput.AllAction || !chara.IsNeutral() || chara.quest != null || EClass.game.quests.IsDeliverTarget(chara)) && chara.isSynced && num <= 2 && ((!chara.HasCondition<ConSuspend>() && (!chara.isRestrained || !chara.IsPCFaction)) || __instance.altAction) && EClass.pc.IsSuccubus())
+                if (!EClass.pc.isBlind && __instance.input == ActInput.AllAction && (__instance.input == ActInput.AllAction || !chara.IsNeutral() || chara.quest != null || EClass.game.quests.IsDeliverTarget(chara)) && chara.isSynced && distance <= 2 && ((!chara.HasCondition<ConSuspend>() && (!chara.isRestrained || !chara.IsPCFaction)) || __instance.altAction) && EClass.pc.IsSuccubus())
                 {
                     if (Settings.NGPN)
                         global::Lang.General.map["AI_Fuck"].text_L = "姦！";
@@ -205,13 +203,11 @@ static class ActPlan_Patch
                     if (!chara.HasCondition<ConSleep>() && chara.HasCondition<ConCharm>())
                         DOIT();
                     if (!chara.IsHostile())
-                    {
                         if (!chara.HasCondition<ConSleep>() && Settings.SexNoNeed)
                             DOIT();
-                    }
                     else
                         if (chara.HasCondition<ConSleep>() || Settings.SexNoNeed)
-                        DOIT();
+                            DOIT();
                     void DOIT() =>
                         __instance.TrySetAct(new AI_Fuck
                         {

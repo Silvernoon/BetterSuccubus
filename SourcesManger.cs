@@ -1,50 +1,84 @@
+extern alias UnityEngine_CoreModule;
+extern alias UnityEngine_Origin;
 using System;
 using System.IO;
-using HarmonyLib;
-using BepInEx.Logging;
-namespace BetterSuccubus;
-extern alias UnityEngine_Origin;
-extern alias UnityEngine_CoreModule;
-
-using BepInEx.Core.Logging.Interpolation;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine_CoreModule.UnityEngine;
-[HarmonyPatch(typeof(SourceElement.Row), nameof(SourceElement.Row.GetSprite))]
-internal static class GetSprite_Patch
-{
-    public static void Postfix(SourceElement.Row __instance, ref Sprite __result)
-    {
-        if (__result == EClass.core.refs.icons.defaultAbility && Ability.Contains(__instance.type))
-            __result = TextureToSprite(LoadTextureByIO(__instance.type)) ?? EClass.core.refs.icons.defaultAbility;
-    }
-    private static Sprite TextureToSprite(Texture2D tex)
-    {
-        Sprite sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-        return sprite;
-    }
-    private static Texture2D LoadTextureByIO(string type)
-    {
-        
-        FileStream fs = new(BetterSuccubus.Path + "/Texture/" + type + ".png", FileMode.Open, FileAccess.Read);
-        fs.Seek(0, SeekOrigin.Begin);//游标
-        byte[] bytes = new byte[fs.Length];//生命字节，用来存储读取到的图片字节
-        fs.Read(bytes, 0, bytes.Length);//开始读取
+using Newtonsoft.Json;
 
-        fs.Close();//切记关闭
-        int width = 64;
-        int height = 64;
-        Texture2D texture = new(width, height);
-        if (texture.LoadImage(bytes))
-        {
-            //BetterSuccubus.Logger.LogInfo("Readed " + type);
+namespace BetterSuccubus;
+
+public class Frame
+{
+    public int Count { get; set; }
+}
+
+public static class TexManager
+{
+    public static Dictionary<string, Sprite[]> FrameMap = [];
+    public static Dictionary<string, Sprite> SpriteMap = [];
+
+    static string texPath;
+
+    static Sprite TextureToSprite(Texture2D tex)
+    {
+        return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+    }
+    static Texture2D LoadTextureByIO(string name)
+    {
+        byte[] image = File.ReadAllBytes(texPath + name + ".png");
+
+        Texture2D texture = new(0, 0);
+        if (texture.LoadImage(image))
             return texture;
-        }
         else
         {
-            BetterSuccubus.Logger.LogError("Cant read " + type);
+            BetterSuccubus.Logger.LogError("Cant read " + name);
             return null;
         }
     }
+    static Sprite[] SplitFrames(Texture2D tex, int frameCount)
+    {
+        List<Sprite> sprites = new List<Sprite>();
 
-    public static string[] Ability = ["ActCharm"];
+        int frameWidth = tex.width / frameCount;
+
+        for (int x = 0; x < frameCount; x++)
+        {
+            Rect frameRect = new Rect(x * frameWidth, 0, frameWidth, tex.height);
+            Sprite frame = Sprite.Create(tex, frameRect, new Vector2(0.5f, 0.5f));
+            sprites.Add(frame);
+        }
+
+        return sprites.ToArray();
+    }
+    public static void Add(string name)
+    {
+        Texture2D tex = LoadTextureByIO(name);
+
+        string jsonPath = texPath + name + ".json";
+        if (File.Exists(jsonPath))
+        {
+            string json = File.ReadAllText(texPath + name + ".json");
+            Frame size = JsonConvert.DeserializeObject<Frame>(json);
+            Sprite[] frames = SplitFrames(tex, size.Count);
+            FrameMap.Add(name, frames);
+        }
+        else
+            SpriteMap.Add(name, TextureToSprite(tex));
+
+        BetterSuccubus.Logger.LogInfo("Add new Sprite :" + name);
+    }
+    public static void Load()
+    {
+        texPath = BetterSuccubus.Path + "/Texture/";
+        string[] files = Directory.GetFiles(texPath, "*.png", SearchOption.AllDirectories);
+
+        foreach (string file in files)
+        {
+            string name = Path.GetFileNameWithoutExtension(file);
+            Add(name);
+        }
+    }
 }
