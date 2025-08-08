@@ -6,10 +6,8 @@ using UnityEngine_CoreModule.UnityEngine;
 
 public class ActCharm : Ability
 {
-    public override Sprite GetSprite() => TexManager.SpriteMap.TryGetValue(this.GetType().Name + "_icon", EClass.core.refs.icons.defaultAbility);
+    public override Sprite GetSprite() => TexManager.SpriteMap.TryGetValue(this.GetType().Name, EClass.core.refs.icons.defaultAbility);
 
-    private Effect effectSuccess = Effect.Get("Element/ball_Fire");
-    private Effect effectFailure = Effect.Get("Element/ball_Fire");
     public override bool Perform()
     {
         if (TC.Chara.HasCondition<ConCharm>() && CC.ai is not AI_Fuck) Texts.Say("「...」", Msg.colors.Ono);
@@ -20,15 +18,17 @@ public class ActCharm : Ability
             //魅力+技能等级+好感度—对象意志=成功率
             if (EClass.rnd(100) < CC.elements.ValueWithoutLink("CHA") + Value + (TC.Chara.affinity.value > 20 ? TC.Chara.affinity.value / 2 : TC.Chara.affinity.value - 10) - TC.elements.ValueWithoutLink("WIL"))
             {// Succuss
+                Effect effectSuccess = Effect.Get("Element/ball_Fire");
                 effectSuccess.sprites = TexManager.FrameMap["Charm_Success"];
-                effectSuccess.Play(TC.pos, 0f, null, null);
+                effectSuccess.Play(TC.pos);
                 Texts.Say(Texts.ActCharmSuccess.RandGet(), Msg.colors.Ono, CC.Name, TC.Name);
                 TC.Chara.AddCondition<ConCharm>(50, true);
             }
             else
             {// Failure
+                Effect effectFailure = Effect.Get("Element/ball_Fire");
                 effectFailure.sprites = TexManager.FrameMap["Charm_Failure"];
-                effectFailure.Play(TC.pos, 0f, null, null);
+                effectFailure.Play(TC.pos);
                 if (TC.Chara.HasCondition<ConCharm>())
                     TC.Chara.RemoveCondition<ConCharm>();
                 else
