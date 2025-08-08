@@ -43,7 +43,7 @@ public class BetterSuccubus : BaseUnityPlugin
         //ModUtil.ImportExcel(Path + "/stats.xlsx", "stats", sources.stats);
         sources.elements.rows.Add(Initer(new SourceElement.Row()
         {
-            id = 6030,
+            id = 60030,
             alias = "ActCharm",
             name_JP = "チャーム",
             name = "Charm",
@@ -77,7 +77,7 @@ public class BetterSuccubus : BaseUnityPlugin
 
         sources.stats.rows.Add(new SourceStat.Row()
         {
-            id = 1069,
+            id = 10069,
             alias = "ConCharm",
             name_L = "魅惑",
             name_JP = "魅了",
@@ -101,7 +101,7 @@ public class BetterSuccubus : BaseUnityPlugin
         });
         sources.stats.rows.Add(new SourceStat.Row()
         {
-            id = 1070,
+            id = 10070,
             alias = "ConCalmDown",
             name_JP = "賢者ターム",
             name = "Calm Down",
@@ -155,6 +155,7 @@ public class BetterSuccubus : BaseUnityPlugin
         Settings.KillRecoverMP = configFile.Bind("Kill", "KillRecoverMP", true, "Kill target being charmed would recover MP.\n超死被魅惑的敌人会回复蓝量").Value;
         Settings.KillRecoverSP = configFile.Bind("Kill", "KillRecoverSP", true, "Kill target being charmed would recover SP.\n超死被魅惑的敌人会回复耐力").Value;
         Settings.KillBoostAttributes = configFile.Bind("Kill", "KillBoostAttributes", 500, "Kill target being charmed would improve attributes.\n超死被魅惑的敌人提升属性的倍率").Value;
+        base.GetType().BaseType.GetField("<Config>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(this, configFile);
     }
     public static string Path { get; private set; }
 

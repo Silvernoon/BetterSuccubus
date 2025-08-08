@@ -1,15 +1,7 @@
 extern alias UnityEngine_Origin;
 extern alias UnityEngine_CoreModule;
-using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.Remoting.Messaging;
 using BetterSuccubus;
-using HarmonyLib;
-using UnityEngine;
-using UnityEngine_CoreModule.UnityEngine;
 public class ActCharm : Ability
 {
     public override bool Perform()
@@ -55,7 +47,6 @@ public class ActCharm : Ability
         return result2;
     }
 }
-
 
 namespace BetterSuccubus
 {
