@@ -39,9 +39,9 @@ static class AddAbility
         {
             return;
         }
-        if (!EClass.pc.HasElement(6030, 1) && EClass.pc.IsSuccubus())
+        if (!EClass.pc.HasElement(60030, 1) && EClass.pc.IsSuccubus())
         {
-            EClass.pc.GainAbility(6030, 1);
+            EClass.pc.GainAbility(60030, 1);
             BetterSuccubus.Logger.LogInfo("Add Ability Successfully");
         }
         else BetterSuccubus.Logger.LogInfo("PC already have ability");
