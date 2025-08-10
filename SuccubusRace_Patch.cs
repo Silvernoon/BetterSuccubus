@@ -8,7 +8,7 @@ namespace BetterSuccubus;
 [HarmonyPatch(typeof(Feat), nameof(Feat.Apply))]
 static class SuccubusRace_Patch
 {
-    private static void Postfix(ref Feat __instance, int a, ElementContainer owner, bool hint = false)
+    static void Postfix(ref Feat __instance, int a, ElementContainer owner, bool hint = false)
     {
         MethodInfo methodInfo = typeof(Feat).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).FirstOrDefault((MethodInfo m) => m.Name.Contains("ModBase"));
         Type type = typeof(Feat).GetNestedTypes(BindingFlags.NonPublic).FirstOrDefault(t => t.Name.Contains("DisplayClass"));
@@ -26,19 +26,16 @@ static class SuccubusRace_Patch
             ]);
         }
     }
-    public const int ActCharm = 60030;
 }
 
 [HarmonyPatch(typeof(Player), nameof(Player.OnLoad))]
 static class AddAbility
 {
-    [HarmonyPostfix]
-    public static void Postfix()
+    static void Postfix()
     {
         if (!Settings.DebugAddAbility)
-        {
             return;
-        }
+        
         if (!EClass.pc.HasElement(60030, 1) && EClass.pc.IsSuccubus())
         {
             EClass.pc.GainAbility(60030, 1);

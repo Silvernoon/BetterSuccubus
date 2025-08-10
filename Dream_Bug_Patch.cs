@@ -8,7 +8,7 @@ using System.Linq;
 namespace BetterSuccubus;
 
 [HarmonyPatch(typeof(ConSleep), nameof(ConSleep.SuccubusVisit))]
-internal static class SuccubusVisit_Patch
+static class SuccubusVisit_Patch
 {
     static bool Prefix(ConSleep __instance, Chara tg)
     {
@@ -17,7 +17,7 @@ internal static class SuccubusVisit_Patch
 }
 
 [HarmonyPatch(typeof(ConSleep), nameof(ConSleep.SuccubusSleep))]
-internal static class SuccubusSleep_Patch
+static class SuccubusSleep_Patch
 {
     static bool Prefix(ConSleep __instance, Chara tg)
     {
@@ -26,9 +26,9 @@ internal static class SuccubusSleep_Patch
 }
 
 [HarmonyPatch(typeof(ActDreamBug), nameof(ActDreamBug.Perform))]
-internal static class ActDreamBug_Perform_Patch
+static class ActDreamBug_Perform_Patch
 {
-    public static void Postfix(ActDreamBug __instance)
+    static void Postfix(ActDreamBug __instance)
     {
         if (Settings.DreamBugMakeSleep && Act.TC != Act.CC)
             Act.TC.Chara.AddCondition<ConSleep>(1000 + __instance.GetPower(Act.CC) * 10, true);
@@ -36,7 +36,7 @@ internal static class ActDreamBug_Perform_Patch
 }
 
 [HarmonyPatch(typeof(Element), nameof(Element.GetCost))]
-internal static class ActDreamBug_Cost_Patch
+static class ActDreamBug_Cost_Patch
 {
     static void Postfix(Element __instance, ref Act.Cost __result)
     {
@@ -46,7 +46,7 @@ internal static class ActDreamBug_Cost_Patch
 }
 
 [HarmonyPatch(typeof(TraitDreamBug), nameof(TraitDreamBug.CanStack), MethodType.Getter)]
-internal static class DreamBug_Stackable
+static class DreamBug_Stackable
 {
     static bool Prefix(ref bool __result)
     {
