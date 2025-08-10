@@ -25,10 +25,8 @@ public class ConCharm : BadCondition
         }
         catch { return; }
     }
-    public override string GetPhaseStr()
-    {
-        return BetterSuccubus.Texts.ConCharmPhaseStr.Lang();
-    }
+    public override string GetPhaseStr() => BetterSuccubus.Texts.ConCharmPhaseStr.Lang();
+    
     public override void Tick()
     {
         //owner.ai = new NoGoal();

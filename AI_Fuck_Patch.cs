@@ -19,7 +19,12 @@ static class AI_Fuck_Patch
         #region Affinity
         //chara2.ModAffinity(chara, flag ? 10 : (-5));
         //flag = chara.IsSuccubus() || chara2.IsSuccubus() || EClass.rnd(2) == 0;
-        codeMatcher.MatchEndForward(new(OpCodes.Ldc_I4_2), new(OpCodes.Call, AccessTools.Method(typeof(EClass), nameof(EClass.rnd))), new(OpCodes.Ldc_I4_0), new(OpCodes.Ceq), new(OpCodes.Stloc_2))
+        codeMatcher.MatchEndForward(
+                new(OpCodes.Ldc_I4_2),
+                new(OpCodes.Call, AccessTools.Method(typeof(EClass), nameof(EClass.rnd))),
+                new(OpCodes.Ldc_I4_0),
+                new(OpCodes.Ceq),
+                new(OpCodes.Stloc_2))
             .Advance(1)
             .InsertAndAdvance(
                 new(OpCodes.Ldloc_0),
@@ -36,14 +41,14 @@ static class AI_Fuck_Patch
             int pos2 = codeMatcher.MatchStartForward(new CodeMatch(OpCodes.Callvirt, AccessTools.DeclaredMethod(typeof(Stats), nameof(Stats.Mod))))
                                   .MatchStartForward(new CodeMatch(OpCodes.Callvirt, AccessTools.DeclaredMethod(typeof(Stats), nameof(Stats.Mod))))
                                   .Pos;
-            codeMatcher.RemoveInstructionsInRange(pos1+1, pos2);
+            codeMatcher.RemoveInstructionsInRange(pos1 + 1, pos2);
             codeMatcher.InsertAndAdvance(//Avoid to Remove Label
                                          new(OpCodes.Ldloc_1),
                                          Transpilers.EmitDelegate(
                                             (Chara chara, Chara chara2) =>
                                             {
                                                 chara.stamina.Mod(chara.IsSuccubus() ? (1 + EClass.rnd(chara.stamina.max / 10 + 1)) : (-5 - EClass.rnd(chara.stamina.max / 10 + 1)));
-                                                chara2.stamina.Mod(chara.IsSuccubus() ? (1 + EClass.rnd(chara.stamina.max / 20 + 1)) :(-5 - EClass.rnd(chara2.stamina.max / 20 + 1)));
+                                                chara2.stamina.Mod(chara.IsSuccubus() ? (1 + EClass.rnd(chara.stamina.max / 20 + 1)) : (-5 - EClass.rnd(chara2.stamina.max / 20 + 1)));
                                             }));
         }
         #endregion
@@ -205,7 +210,7 @@ static class ActPlan_Patch
                     if (!chara.IsHostile())
                         if (!chara.HasCondition<ConSleep>() && Settings.SexNoNeed)
                             DOIT();
-                    else
+                        else
                         if (chara.HasCondition<ConSleep>() || Settings.SexNoNeed)
                             DOIT();
                     void DOIT() =>
