@@ -10,7 +10,7 @@ static class SuccubusRace_Patch
 {
   static void Postfix(ref Feat __instance, int a, ElementContainer owner, bool hint = false)
   {
-    MethodInfo methodInfo = typeof(Feat).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).FirstOrDefault((MethodInfo m) => m.Name.Contains("ModBase"));
+    MethodInfo methodInfo = typeof(Feat).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).FirstOrDefault(m => m.Name.Contains("ModBase"));
     Type type = typeof(Feat).GetNestedTypes(BindingFlags.NonPublic).FirstOrDefault(t => t.Name.Contains("DisplayClass"));
     object obj = Activator.CreateInstance(type);
     type.GetField("owner").SetValue(obj, owner);
