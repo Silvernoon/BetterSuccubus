@@ -132,7 +132,7 @@ public class BetterSuccubus : BaseUnityPlugin
     Settings.DrainScale = configFile.Bind("Drain", "DrainScale", 0.1f, "The maximum of drain of HP and MP equal to Max Stamina * the scale.\nSet to 0.1 means One tenth of Max Stamina.\n吸取倍率，吸取量（随机数）的最大值等于 自己最大耐力*这个值\n0.1就表示最大耐力的十分之一").Value;
     Settings.EnableNoHunger = configFile.Bind("Hunger", "EnableNoHunger", true, "Sex would reduct Hunger.\n超人会减少饥饿").Value;
     Settings.HungerValue = configFile.Bind("Hunger", "HungerValue", 20, "The Value reduct Hunger.\nEvery 50 of Hunger is a stage.\n减少饥饿的量，每50是一个阶段").Value;
-    Settings.SexNoNeed = configFile.Bind("Ability", "SexNoNeed", false, "Able to sex even without precondition.\n超人无需前置条件").Value;
+    Settings.SexNoNeed = configFile.Bind("Ability", "SexNoNeed", false, "Able to sex even without precondition (Sleep).\n超人无需前置条件（睡眠）").Value;
     //Settings.SexNoSleepy = configFile.Bind("Ability", "SexNoSleepy", true, "Sex no longer make you sleepy\n超人不再困倦").Value;
     Settings.SkillImprovement = configFile.Bind("Ability", "SkillImprovement", true, "Improve Skill (not Potential) after sex.\n超人提高技能（非潜力）").Value;
     Settings.SkillImprovementValue = configFile.Bind("Ability", "SkillImprovementValue", 250, "The value of Skill improvement (not Potential) after sex.\n超人提高技能（非潜力）的数值").Value;
