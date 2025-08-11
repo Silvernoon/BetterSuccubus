@@ -72,4 +72,12 @@
 			<HintPath>$(GamePath)\Elin_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
 		</Reference>
 	</ItemGroup>
+	
+	<ItemGroup>
+	  <EditorConfigFiles Remove="D:\Code\BetterSuccubus\.editorconfig" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <None Include="D:\Code\BetterSuccubus\.editorconfig" />
+	</ItemGroup>
 </Project>
