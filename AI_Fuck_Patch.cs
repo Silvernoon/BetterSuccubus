@@ -1,7 +1,9 @@
+extern alias UnityEngine_CoreModule;
 using System;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 using HarmonyLib;
+using UnityEngine_CoreModule.UnityEngine;
 
 namespace BetterSuccubus;
 
@@ -34,17 +36,18 @@ static class AI_Fuck_Patch
       int pos1 = codeMatcher.MatchStartForward(new(OpCodes.Ldloc_0), 
                                                new(OpCodes.Callvirt, AccessTools.DeclaredPropertyGetter(typeof(Card), nameof(Card.IsPCParty))))
                             .Pos;
-      int pos2 = codeMatcher.MatchStartForward(new CodeMatch(OpCodes.Callvirt, AccessTools.DeclaredMethod(typeof(Stats), nameof(Stats.Mod))))
+      int pos2 = codeMatcher.Clone().MatchStartForward(new CodeMatch(OpCodes.Callvirt, AccessTools.DeclaredMethod(typeof(Stats), nameof(Stats.Mod))))
                             .MatchStartForward(new CodeMatch(OpCodes.Callvirt, AccessTools.DeclaredMethod(typeof(Stats), nameof(Stats.Mod))))
                             .Pos;
       codeMatcher.RemoveInstructionsInRange(pos1 + 1, pos2);
+      codeMatcher.Advance(1);
       codeMatcher.InsertAndAdvance(//Avoid to Remove Label
                                    new(OpCodes.Ldloc_1),
                                    Transpilers.EmitDelegate(
                                       (Chara chara, Chara chara2) =>
                                       {
                                         chara.stamina.Mod(chara.IsSuccubus() ? (1 + EClass.rnd(chara.stamina.max / 10 + 1)) : (-5 - EClass.rnd(chara.stamina.max / 10 + 1)));
-                                        chara2.stamina.Mod(chara.IsSuccubus() ? (1 + EClass.rnd(chara.stamina.max / 20 + 1)) : (-5 - EClass.rnd(chara2.stamina.max / 20 + 1)));
+                                        chara2.stamina.Mod(chara2.IsSuccubus() ? (1 + EClass.rnd(chara2.stamina.max / 20 + 1)) : (-5 - EClass.rnd(chara2.stamina.max / 20 + 1)));
                                       }));
     }
     #endregion
@@ -63,10 +66,6 @@ static class AI_Fuck_Patch
     #endregion
 
     return codeMatcher.InstructionEnumeration();
-  }
-  static void StaminaMod(Chara chara, Chara chara2)
-  {
-
   }
   static void Damage(Chara chara, Chara chara2)
   {
@@ -133,7 +132,7 @@ static class AI_Fuck_Run_Patch
     codeMatcher.Start().MatchEndForward(new(OpCodes.Ldfld), new(OpCodes.Callvirt, AccessTools.Method(typeof(CardRenderer), "PlayAnime", [typeof(AnimeID), typeof(Card)])))
         .Advance(1).InsertAndAdvance(ccttc).InsertAndAdvance(Transpilers.EmitDelegate(StatMod));
 
-    codeMatcher.Start().MatchEndForward(new(OpCodes.Ldc_I4_0), new(OpCodes.Callvirt, AccessTools.Method(typeof(CardRenderer), "PlayAnime", [typeof(AnimeID), typeof(UnityEngine_CoreModule.UnityEngine.Vector3), typeof(bool)])))
+    codeMatcher.Start().MatchEndForward(new(OpCodes.Ldc_I4_0), new(OpCodes.Callvirt, AccessTools.Method(typeof(CardRenderer), "PlayAnime", [typeof(AnimeID), typeof(Vector3), typeof(bool)])))
         .Advance(1).InsertAndAdvance(tctcc).InsertAndAdvance(Transpilers.EmitDelegate(StatMod));
 
     return codeMatcher.InstructionEnumeration();

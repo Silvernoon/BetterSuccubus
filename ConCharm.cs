@@ -36,7 +36,7 @@ public class ConCharm : BadCondition
     else owner.ai.DoGoto(pc.pos, 1, false, null);
 
     owner.enemy = null;
-    owner.ShowEmo(Emo.love, 1f, false);
+    //owner.ShowEmo(Emo.love, 1f, false);
 
     if (pc.enemy == owner.Chara) //玩家仇恨
       pc.enemy = null;
