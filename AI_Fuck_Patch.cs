@@ -1,12 +1,7 @@
-extern alias UnityEngine_CoreModule;
-using System.Collections.Generic;
-using HarmonyLib;
-using System.Reflection.Emit;
-using System.Linq;
-using System.Reflection;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System;
+using System.Collections.Generic;
+using System.Reflection.Emit;
+using HarmonyLib;
 
 namespace BetterSuccubus;
 
@@ -36,8 +31,9 @@ static class AI_Fuck_Patch
     #region Stamina Recover
     if (Settings.EnableSTRecover)
     {
-      codeMatcher.MatchStartForward(new(OpCodes.Ldloc_0), new(OpCodes.Callvirt, AccessTools.DeclaredPropertyGetter(typeof(Card), nameof(Card.IsPCParty))));
-      int pos1 = codeMatcher.Pos;
+      int pos1 = codeMatcher.MatchStartForward(new(OpCodes.Ldloc_0), 
+                                               new(OpCodes.Callvirt, AccessTools.DeclaredPropertyGetter(typeof(Card), nameof(Card.IsPCParty))))
+                            .Pos;
       int pos2 = codeMatcher.MatchStartForward(new CodeMatch(OpCodes.Callvirt, AccessTools.DeclaredMethod(typeof(Stats), nameof(Stats.Mod))))
                             .MatchStartForward(new CodeMatch(OpCodes.Callvirt, AccessTools.DeclaredMethod(typeof(Stats), nameof(Stats.Mod))))
                             .Pos;
