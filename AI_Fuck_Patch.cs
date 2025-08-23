@@ -18,7 +18,7 @@ static class AI_Fuck_Patch
     //flag = chara.IsSuccubus() || chara2.IsSuccubus() || EClass.rnd(2) == 0;
     codeMatcher.MatchEndForward(
             new(OpCodes.Ldc_I4_2),
-            new(OpCodes.Call, AccessTools.Method(typeof(EClass), nameof(EClass.rnd))),
+            new(OpCodes.Call, AccessTools.Method(typeof(EClass), nameof(EClass.rnd), [typeof(int)])),
             new(OpCodes.Ldc_I4_0),
             new(OpCodes.Ceq),
             new(OpCodes.Stloc_2))
@@ -33,7 +33,7 @@ static class AI_Fuck_Patch
     #region Stamina Recover
     if (Settings.EnableSTRecover)
     {
-      int pos1 = codeMatcher.MatchStartForward(new(OpCodes.Ldloc_0), 
+      int pos1 = codeMatcher.MatchStartForward(new(OpCodes.Ldloc_0),
                                                new(OpCodes.Callvirt, AccessTools.DeclaredPropertyGetter(typeof(Card), nameof(Card.IsPCParty))))
                             .Pos;
       int pos2 = codeMatcher.Clone().MatchStartForward(new CodeMatch(OpCodes.Callvirt, AccessTools.DeclaredMethod(typeof(Stats), nameof(Stats.Mod))))
@@ -190,19 +190,22 @@ static class ActPlan_Patch
                 && EClass.pc.IsSuccubus())
         {
           if (Settings.NGPN)
-            global::Lang.General.map["AI_Fuck"].text_L = "姦！";
+            Lang.General.map["AI_Fuck"].text_L = "姦！";
           else if (chara.HasCondition<ConCharm>())
           {
-            global::Lang.General.map["AI_Fuck"].text_L = "捕食";
-            global::Lang.General.map["AI_Fuck"].text_JP = "エナジードレイン";
-            global::Lang.General.map["AI_Fuck"].text = "Prey";
+            if (Lang.langCode == "CN")
+              Lang.General.map["AI_Fuck"].text_L = "捕食";
+            else Lang.General.map["AI_Fuck"].text_L = "Prey";
+            Lang.General.map["AI_Fuck"].text_JP = "エナジードレイン";
+            Lang.General.map["AI_Fuck"].text = "Prey";
           }
           else
           {
-            global::Lang.General.map["AI_Fuck"].text_L = "干坏坏的事";
-            global::Lang.General.map["AI_Fuck"].text = "Seduce";
-            global::Lang.General.map["AI_Fuck"].text_JP = "悪さをする";
+            Lang.General.map["AI_Fuck"].text_L = Texts.AI_FuckText.text_L;
+            Lang.General.map["AI_Fuck"].text_JP = Texts.AI_FuckText.text_JP;
+            Lang.General.map["AI_Fuck"].text = Texts.AI_FuckText.text;
           }
+
           if (chara.HasCondition<ConCharm>())
             DOIT();
           else if (!chara.IsHostile() && !chara.HasCondition<ConSleep>() && Settings.SexNoNeed)
@@ -222,6 +225,17 @@ static class ActPlan_Patch
   }
 }
 
+[HarmonyPatch(typeof(Player), nameof(Player.OnLoad))]
+static class GetText_AI_Fuck
+{
+  static void Postfix()
+  {
+    Texts.AI_FuckText.text = Lang.General.map["AI_Fuck"].text;
+    Texts.AI_FuckText.text_L = Lang.General.map["AI_Fuck"].text_L;
+    Texts.AI_FuckText.text_JP = Lang.General.map["AI_Fuck"].text_JP;
+  }
+}
+
 public static class CharaExtension
 {
   public static bool IsSuccubus(this Chara chara)
@@ -236,4 +250,9 @@ public static class TranspilersExtension
   {
     return new CodeInstruction(OpCodes.Callvirt, action.Method);
   }
+}
+
+public static partial class Texts
+{
+  public static LangGeneral.Row AI_FuckText { set; get; } = new LangGeneral.Row();
 }
