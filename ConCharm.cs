@@ -87,10 +87,10 @@ namespace BetterSuccubus
 
   }
 
-  [HarmonyPatch(typeof(Chara), nameof(Chara.Kick), [typeof(Chara), typeof(bool), typeof(bool), typeof(bool)])]
+  [HarmonyPatch(typeof(Chara), nameof(Chara.Kick), [typeof(Chara), typeof(bool), typeof(bool), typeof(bool), typeof(bool)])]
   internal static class Kick_Patch
   {
-    public static void Postfix(Chara __instance, Chara t, bool ignoreSelf = false, bool karmaLoss = true)
+    public static void Postfix(Chara t)
     {
       t.RemoveCondition<ConCharm>();
     }

@@ -257,3 +257,6 @@ dotnet_style_prefer_auto_properties = true:silent
 dotnet_style_object_initializer = true:suggestion
 dotnet_style_collection_initializer = true:suggestion
 dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
+
+# IDE0040: 添加可访问性修饰符
+dotnet_diagnostic.IDE0040.severity = silent

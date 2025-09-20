@@ -24,6 +24,13 @@ public class ActCharm : Ability
         effectSuccess.Play(TC.pos);
         Texts.Say(Texts.ActCharmSuccess.RandGet(), Msg.colors.Ono, CC.Name, TC.Name);
         TC.Chara.AddCondition<ConCharm>(50, true);
+
+        foreach (Chara chara in pc.party.members) //同伴仇恨
+          if (chara.enemy == owner.Chara && chara.ai is GoalCombat)
+          {
+            chara.enemy = null;
+            chara.SetAI(new NoGoal());
+          }
       }
       else
       {// Failure

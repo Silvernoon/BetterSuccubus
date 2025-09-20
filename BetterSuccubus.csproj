@@ -29,7 +29,7 @@
 	</ItemGroup>
 	
 	<PropertyGroup>
-		<GamePath>E:\SteamLibrary\steamapps\common\Elin</GamePath>
+		<GamePath>D:\Steam\steamapps\common\Elin</GamePath>
 	</PropertyGroup>
 	
 	<ItemGroup>
@@ -80,4 +80,8 @@
 	<ItemGroup>
 	  <None Include="D:\Code\BetterSuccubus\.editorconfig" />
 	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="copy $(ProjectDir)$(OutDir)BetterSuccubus.dll $(GamePath)\Package\BetterSuccubus" />
+	</Target>
 </Project>

@@ -93,7 +93,53 @@ static class AI_Fuck_Patch
         break;
       }
   }
+
+
+  static void Postfix(AI_Fuck __instance)
+  {
+    #region Milk & Eggs
+    if (Settings.MNE_Player_Patch)
+    {
+      if (Settings.MNE_Player_Milk.chance != 0 && EClass.rnd(Settings.MNE_Player_Milk.chance) == 0)
+        __instance.owner.MakeMilk(true);
+      if (Settings.MNE_Player_Egg.chance != 0 && EClass.rnd(Settings.MNE_Player_Egg.chance) == 0)
+        __instance.owner.MakeEgg(true, 1, true, Settings.MNE_Player_Egg.fertChance != 0 ? Settings.MNE_Player_Egg.fertChance : int.MaxValue);
+    }
+    else
+      GenderSelect(__instance.owner);
+
+    GenderSelect(__instance.target);
+
+    static void GenderSelect(Chara c)
+    {
+      switch (c.bio.gender)
+      {
+        case 1: // Female
+          if (Settings.MNE_Female_Milk.chance != 0 && EClass.rnd(Settings.MNE_Female_Milk.chance) == 0)
+            c.MakeMilk(true);
+          if (Settings.MNE_Female_Egg.chance != 0 && EClass.rnd(Settings.MNE_Female_Egg.chance) == 0)
+            c.MakeEgg(true, 1, true, Settings.MNE_Female_Egg.fertChance != 0 ? Settings.MNE_Female_Egg.fertChance : int.MaxValue);
+          break;
+        case 2: // Male
+          if (Settings.MNE_Male_Milk.chance != 0 && EClass.rnd(Settings.MNE_Male_Milk.chance) == 0)
+            c.MakeMilk(true);
+          if (Settings.MNE_Male_Egg.chance != 0 && EClass.rnd(Settings.MNE_Male_Egg.chance) == 0)
+            c.MakeEgg(true, 1, true, Settings.MNE_Male_Egg.fertChance != 0 ? Settings.MNE_Male_Egg.fertChance : int.MaxValue);
+          break;
+        default: // ???
+          if (Settings.MNE_NonBin_Milk.chance != 0 && EClass.rnd(Settings.MNE_NonBin_Milk.chance) == 0)
+            c.MakeMilk(true);
+          if (Settings.MNE_NonBin_Egg.chance != 0 && EClass.rnd(Settings.MNE_NonBin_Egg.chance) == 0)
+            c.MakeEgg(true, 1, true, Settings.MNE_NonBin_Egg.fertChance != 0 ? Settings.MNE_NonBin_Egg.fertChance : int.MaxValue);
+          break;
+      }
+    }
+    #endregion
+  }
+
+
 }
+
 
 [HarmonyPatch(typeof(Chara), nameof(Chara.Die))]
 static class OnDie
@@ -183,11 +229,11 @@ static class ActPlan_Patch
         if (distance > 1 && EClass.pc.isBlind)
           return;
 
-        bool isKey = __instance.input == ActInput.Key;
-        if (!EClass.pc.isBlind && __instance.input == ActInput.AllAction && (__instance.input == ActInput.AllAction || !chara.IsNeutral() || chara.quest != null || EClass.game.quests.IsDeliverTarget(chara)) && chara.isSynced && distance <= 2
-                && ((!chara.HasCondition<ConSuspend>()
-                && (!chara.isRestrained || !chara.IsPCFaction)) || __instance.altAction)
-                && EClass.pc.IsSuccubus())
+        //bool isKey = __instance.input == ActInput.Key;
+        if (!EClass.pc.isBlind && __instance.input == ActInput.AllAction
+          && chara.isSynced && distance <= 2
+          && ((!chara.HasCondition<ConSuspend>() && (!chara.isRestrained || !chara.IsPCFaction)) || __instance.altAction)
+          && EClass.pc.IsSuccubus())
         {
           if (Settings.NGPN)
             Lang.General.map["AI_Fuck"].text_L = "姦！";
@@ -206,10 +252,14 @@ static class ActPlan_Patch
             Lang.General.map["AI_Fuck"].text = Texts.AI_FuckText.text;
           }
 
-          if (chara.HasCondition<ConCharm>())
-            DOIT();
-          else if (!chara.IsHostile() && !chara.HasCondition<ConSleep>() && Settings.SexNoNeed)
-            DOIT();
+          bool vanilla = !chara.IsHostile() && chara.HasCondition<ConSleep>();
+          if (!vanilla) // avoid same in vanilla
+          {
+            if (chara.HasCondition<ConCharm>())
+              DOIT();
+            else if (!chara.IsHostile() && !chara.HasCondition<ConSleep>() && Settings.SexNoNeed)
+              DOIT();
+          }
           // has ConSleep do in vanilla
 
           void DOIT() =>
