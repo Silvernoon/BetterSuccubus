@@ -16,7 +16,7 @@ static class SuccubusRace_Patch
     type.GetField("owner").SetValue(obj, owner);
     type.GetField("hint").SetValue(obj, hint);
     if (__instance.id == 1216 && __instance.owner == EClass.pc.elements)
-      methodInfo.Invoke(__instance, [60030, a, false, obj]);
+      methodInfo.Invoke(__instance, [Data.ActCharm.id, a, false, obj]);
   }
 }
 
@@ -28,14 +28,14 @@ static class AddAbility
     if (!Settings.DebugAddAbility)
       return;
 
-    if (!EClass.pc.HasElement(60030, 1) && EClass.pc.IsSuccubus())
+    if (!EClass.pc.HasElement(Data.ActCharm.id, 1) && EClass.pc.IsSuccubus())
     {
       var method = typeof(Chara).GetMethod("GainAbility");
       ParameterInfo[] parameters = method.GetParameters();
       if (parameters.Length == 2)
-        method.Invoke(EClass.pc, [60030, 1]);
+        method.Invoke(EClass.pc, [Data.ActCharm.id, 1]);
       else if (parameters.Length == 3)
-        method.Invoke(EClass.pc, [60030, 1, null]);
+        method.Invoke(EClass.pc, [Data.ActCharm.id, 1, null]);
 
       BetterSuccubus.Logger.LogInfo("Add Ability Successfully");
     }
