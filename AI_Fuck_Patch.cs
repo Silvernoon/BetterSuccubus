@@ -98,40 +98,43 @@ static class AI_Fuck_Patch
   static void Postfix(AI_Fuck __instance)
   {
     #region Milk & Eggs
-    if (Settings.MNE_Player_Patch)
+    if (Settings.EnableMNE)
     {
-      if (Settings.MNE_Player_Milk.chance != 0 && EClass.rnd(Settings.MNE_Player_Milk.chance) == 0)
-        __instance.owner.MakeMilk(true);
-      if (Settings.MNE_Player_Egg.chance != 0 && EClass.rnd(Settings.MNE_Player_Egg.chance) == 0)
-        __instance.owner.MakeEgg(true, 1, true, Settings.MNE_Player_Egg.fertChance != 0 ? Settings.MNE_Player_Egg.fertChance : int.MaxValue);
-    }
-    else
-      GenderSelect(__instance.owner);
-
-    GenderSelect(__instance.target);
-
-    static void GenderSelect(Chara c)
-    {
-      switch (c.bio.gender)
+      if (Settings.MNE_Player_Patch)
       {
-        case 1: // Female
-          if (Settings.MNE_Female_Milk.chance != 0 && EClass.rnd(Settings.MNE_Female_Milk.chance) == 0)
-            c.MakeMilk(true);
-          if (Settings.MNE_Female_Egg.chance != 0 && EClass.rnd(Settings.MNE_Female_Egg.chance) == 0)
-            c.MakeEgg(true, 1, true, Settings.MNE_Female_Egg.fertChance != 0 ? Settings.MNE_Female_Egg.fertChance : int.MaxValue);
-          break;
-        case 2: // Male
-          if (Settings.MNE_Male_Milk.chance != 0 && EClass.rnd(Settings.MNE_Male_Milk.chance) == 0)
-            c.MakeMilk(true);
-          if (Settings.MNE_Male_Egg.chance != 0 && EClass.rnd(Settings.MNE_Male_Egg.chance) == 0)
-            c.MakeEgg(true, 1, true, Settings.MNE_Male_Egg.fertChance != 0 ? Settings.MNE_Male_Egg.fertChance : int.MaxValue);
-          break;
-        default: // ???
-          if (Settings.MNE_NonBin_Milk.chance != 0 && EClass.rnd(Settings.MNE_NonBin_Milk.chance) == 0)
-            c.MakeMilk(true);
-          if (Settings.MNE_NonBin_Egg.chance != 0 && EClass.rnd(Settings.MNE_NonBin_Egg.chance) == 0)
-            c.MakeEgg(true, 1, true, Settings.MNE_NonBin_Egg.fertChance != 0 ? Settings.MNE_NonBin_Egg.fertChance : int.MaxValue);
-          break;
+        if (Settings.MNE_Player_Milk.chance != 0 && EClass.rnd(Settings.MNE_Player_Milk.chance) == 0)
+          __instance.owner.MakeMilk(true);
+        if (Settings.MNE_Player_Egg.chance != 0 && EClass.rnd(Settings.MNE_Player_Egg.chance) == 0)
+          __instance.owner.MakeEgg(true, 1, true, Settings.MNE_Player_Egg.fertChance != 0 ? Settings.MNE_Player_Egg.fertChance : int.MaxValue);
+      }
+      else
+        GenderSelect(__instance.owner);
+
+      GenderSelect(__instance.target);
+
+      static void GenderSelect(Chara c)
+      {
+        switch (c.bio.gender)
+        {
+          case 1: // Female
+            if (Settings.MNE_Female_Milk.chance != 0 && EClass.rnd(Settings.MNE_Female_Milk.chance) == 0)
+              c.MakeMilk(true);
+            if (Settings.MNE_Female_Egg.chance != 0 && EClass.rnd(Settings.MNE_Female_Egg.chance) == 0)
+              c.MakeEgg(true, 1, true, Settings.MNE_Female_Egg.fertChance != 0 ? Settings.MNE_Female_Egg.fertChance : int.MaxValue);
+            break;
+          case 2: // Male
+            if (Settings.MNE_Male_Milk.chance != 0 && EClass.rnd(Settings.MNE_Male_Milk.chance) == 0)
+              c.MakeMilk(true);
+            if (Settings.MNE_Male_Egg.chance != 0 && EClass.rnd(Settings.MNE_Male_Egg.chance) == 0)
+              c.MakeEgg(true, 1, true, Settings.MNE_Male_Egg.fertChance != 0 ? Settings.MNE_Male_Egg.fertChance : int.MaxValue);
+            break;
+          default: // ???
+            if (Settings.MNE_NonBin_Milk.chance != 0 && EClass.rnd(Settings.MNE_NonBin_Milk.chance) == 0)
+              c.MakeMilk(true);
+            if (Settings.MNE_NonBin_Egg.chance != 0 && EClass.rnd(Settings.MNE_NonBin_Egg.chance) == 0)
+              c.MakeEgg(true, 1, true, Settings.MNE_NonBin_Egg.fertChance != 0 ? Settings.MNE_NonBin_Egg.fertChance : int.MaxValue);
+            break;
+        }
       }
     }
     #endregion
