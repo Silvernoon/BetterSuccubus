@@ -1,6 +1,7 @@
 extern alias UnityEngine_CoreModule;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
 using UnityEngine_CoreModule.UnityEngine;
@@ -139,8 +140,6 @@ static class AI_Fuck_Patch
     }
     #endregion
   }
-
-
 }
 
 
@@ -183,6 +182,12 @@ static class AI_Fuck_Run_Patch
 
     codeMatcher.Start().MatchEndForward(new(OpCodes.Ldc_I4_0), new(OpCodes.Callvirt, AccessTools.Method(typeof(CardRenderer), "PlayAnime", [typeof(AnimeID), typeof(Vector3), typeof(bool)])))
         .Advance(1).InsertAndAdvance(tctcc).InsertAndAdvance(Transpilers.EmitDelegate(StatMod));
+
+    #region
+    codeMatcher.Start().MatchStartForward(new CodeMatch(OpCodes.Stfld, typeof(AI_Fuck).GetField("maxProgress",BindingFlags.Public | BindingFlags.Instance)))
+      .Advance(-1).Operand = Settings.ProgressCount;
+    codeMatcher.Advance(-2).Operand = Settings.NtrProgressCount;
+    #endregion
 
     return codeMatcher.InstructionEnumeration();
   }
@@ -259,18 +264,20 @@ static class ActPlan_Patch
           if (!vanilla) // avoid same in vanilla
           {
             if (chara.HasCondition<ConCharm>())
-              DOIT();
+              __instance.TrySetAct(new AI_Fuck
+              {
+                target = chara,
+                succubus = true,
+                ntr = Settings.PreyIsNtr
+              }, chara);
             else if (!chara.IsHostile() && !chara.HasCondition<ConSleep>() && Settings.SexNoNeed)
-              DOIT();
+              __instance.TrySetAct(new AI_Fuck
+              {
+                target = chara,
+                succubus = true
+              }, chara);
           }
           // has ConSleep do in vanilla
-
-          void DOIT() =>
-                    __instance.TrySetAct(new AI_Fuck
-                    {
-                      target = chara,
-                      succubus = true
-                    }, chara);
         }
       });
     }
