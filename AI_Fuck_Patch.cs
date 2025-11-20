@@ -1,6 +1,7 @@
 extern alias UnityEngine_CoreModule;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
@@ -174,11 +175,33 @@ static class AI_Fuck_Run_Patch
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
     CodeMatcher codeMatcher = new(instructions);
-    var ccttc = codeMatcher.MatchStartForward(new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(Card), "LookAt", [typeof(Card)]))).InstructionsWithOffsets(-5, -1);
-    var tctcc = codeMatcher.MatchStartForward(new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(Card), "LookAt", [typeof(Card)]))).InstructionsWithOffsets(-5, -1);
+
+    int pos_end = codeMatcher.MatchStartForward(new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(Card), "LookAt", [typeof(Card)]))).Pos;
+    int pos_start = codeMatcher.MatchStartBackwards(new CodeMatch(OpCodes.Ldarg_0)).Pos;
+    var unknownChara1 = codeMatcher.InstructionsInRange(pos_start, pos_end-1);
+
+    pos_end = pos_start - 1;
+    pos_start = codeMatcher.Advance(-1).MatchStartBackwards(new CodeMatch(OpCodes.Ldarg_0)).Pos;
+    var unknownChara2 = codeMatcher.InstructionsInRange(pos_start, pos_end);
+
+    List<CodeInstruction> tc, cc;
+
+    if (unknownChara1.Last().operand.ToString().Contains("tc"))
+    {
+      tc = unknownChara1;
+      cc = unknownChara2;
+    }
+    else
+    {
+      tc = unknownChara2;
+      cc = unknownChara1;
+    }
+
+    var ccttc = cc.Concat(tc).ToList();
+    var tctcc = tc.Concat(cc).ToList();
 
     codeMatcher.Start().MatchEndForward(new(OpCodes.Ldfld), new(OpCodes.Callvirt, AccessTools.Method(typeof(CardRenderer), "PlayAnime", [typeof(AnimeID), typeof(Card)])))
-        .Advance(1).InsertAndAdvance(ccttc).InsertAndAdvance(Transpilers.EmitDelegate(StatMod));
+          .Advance(1).InsertAndAdvance(ccttc).InsertAndAdvance(Transpilers.EmitDelegate(StatMod));
 
     codeMatcher.Start().MatchEndForward(new(OpCodes.Ldc_I4_0), new(OpCodes.Callvirt, AccessTools.Method(typeof(CardRenderer), "PlayAnime", [typeof(AnimeID), typeof(Vector3), typeof(bool)])))
         .Advance(1).InsertAndAdvance(tctcc).InsertAndAdvance(Transpilers.EmitDelegate(StatMod));
@@ -268,7 +291,7 @@ static class ActPlan_Patch
               {
                 target = chara,
                 succubus = true,
-                ntr = Settings.PreyIsNtr
+                variation = AI_Fuck.Variation.NTR
               }, chara);
             else if (!chara.IsHostile() && !chara.HasCondition<ConSleep>() && Settings.SexNoNeed)
               __instance.TrySetAct(new AI_Fuck
